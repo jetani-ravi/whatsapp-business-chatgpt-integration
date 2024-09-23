@@ -47,4 +47,4 @@ getChatGPTResponse = async (message) => {
     throw error;
   }
 };
-module.exports = getChatGPTResponse;
+module.exports = {getChatGPTResponse};
