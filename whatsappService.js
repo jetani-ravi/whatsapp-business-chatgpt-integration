@@ -1,7 +1,7 @@
 const axios = require('axios');
-const { WHATSAPP_API_URL } = require('../constant');
+const { WHATSAPP_API_URL } = require('./constant');
 
-exports.sendMessage = async (phone_number_id, to, message) => {
+const sendMessage = async (phone_number_id, to, message) => {
   try {
     await axios.post(
       `${WHATSAPP_API_URL}/${phone_number_id}/messages`,
@@ -22,3 +22,5 @@ exports.sendMessage = async (phone_number_id, to, message) => {
     throw error;
   }
 };
+
+module.exports = { sendMessage };

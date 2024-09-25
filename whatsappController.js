@@ -1,5 +1,5 @@
-const whatsappService = require("../services/whatsappService");
-const openaiService = require("../services/openaiService");
+const whatsappService = require("./whatsappService");
+const openaiService = require("./openaiService");
 
 const verifyWebhook = (req, res) => {
   const mode = req.query["hub.mode"];
@@ -9,7 +9,7 @@ const verifyWebhook = (req, res) => {
   if (mode && token === process.env.VERIFY_TOKEN) {
     res.status(200).send(challenge);
   } else {
-    res.sendStatus(403);
+    res.status(403).send('Forbidden');
   }
 };
 
@@ -43,14 +43,15 @@ const handleWebhook = async (req, res) => {
           }
         }
       }
-      res.sendStatus(200);
+      res.status(200).send('OK');
     } catch (error) {
       console.error("Error processing webhook:", error);
-      res.sendStatus(500);
+      res.status(500).send('Internal Server Error');
     }
   } else {
-    res.sendStatus(404);
+    res.status(404).send('Not Found');
   }
 };
 
 module.exports = { verifyWebhook, handleWebhook };
+
