@@ -3,16 +3,48 @@
   "version": "1.0.0",
   "main": "app.js",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^1.6.2",
     "body-parser": "^1.19.0",
-    "dotenv": "^10.0.0",
-    "express": "^4.17.1",
-    "openai": "^4.0.0"
+    "compression": "^1.7.5",
+    "concurrently": "^9.1.2",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.18.2",
+    "helmet": "^8.0.0",
+    "mongoose": "^8.9.6",
+    "morgan": "^1.10.0",
+    "openai": "^4.0.0",
+    "pm2": "^5.4.3"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node dist/index.js",
+    "dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:watch": "concurrently \"npm run build:watch\" \"nodemon dist/index.js\"",
+    "dev:debug": "cross-env NODE_ENV=development ts-node-dev --inspect --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "lint": "eslint . --ext .ts",
+    "pm2:start": "pm2 start dist/index.js --name whatsapp-openai",
+    "pm2:stop": "pm2 stop whatsapp-openai",
+    "pm2:restart": "pm2 restart whatsapp-openai",
+    "pm2:logs": "pm2 logs whatsapp-openai",
+    "prepare": "npm run build"
   },
   "author": "Ravi Jetani",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.10.0",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.2"
+  }
 }
