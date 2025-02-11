@@ -9,7 +9,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import router from './Routes/v1';
+import router from './routes/v1';
 import { connectDatabase } from './config/database';
 
 
@@ -40,8 +40,6 @@ app.use('/api/v1', router);
 app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
-
-console.log('ENV', process.env['OPENAI_API_KEY'])
 // 404 Handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({

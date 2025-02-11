@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { WHATSAPP_API_URL } from '../config/constant';
 
-const sendMessage = async (
+export const sendMessage = async (
   phone_number_id: string,
   to: string,
   message: string
@@ -37,20 +37,14 @@ const sendMessage = async (
   }
 };
 
-const sendProductRecommendations = async (
-  phone_number_id: string,
+export const sendProductRecommendations = async (
+  phoneNumberId: string,
   to: string,
-  products: string[]
-): Promise<void> => {
-  try {
-    const productList = products.map(product => `• ${product}`).join('\n');
-    const message = `Based on our conversation, here are your recommended products:\n\n${productList}\n\nWould you like to discuss these recommendations further over a voice call or continue via chat?`;
-    
-    await sendMessage(phone_number_id, to, message);
-  } catch (error) {
-    console.error('Error sending product recommendations:', error);
-    throw error;
-  }
-};
+  products: Array<{name: string, description: string, link: string}>
+) => {
+  const message = `Here are your recommended products:\n\n${products.map((product, index) => (
+    `${index + 1}. *${product.name}*\n${product.description}\n${product.link}\n`
+  )).join('\n')}`;
 
-export { sendMessage, sendProductRecommendations };
+  return await sendMessage(phoneNumberId, to, message);
+};
