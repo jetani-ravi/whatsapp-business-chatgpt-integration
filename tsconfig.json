@@ -23,7 +23,11 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "paths": {
-      "*": ["node_modules/*", "src/types/*"]
+      "@Controllers/*": ["src/Controllers/*"],
+      "@Models/*": ["src/Models/*"],
+      "@Services/*": ["src/Services/*"],
+      "@Routes/*": ["src/Routes/*"],
+      "@Types/*": ["src/Types/*"]
     },
     
     /* Emit */

@@ -1,5 +1,5 @@
 import express from 'express';
-import { verifyWebhook, handleWebhook, sendRecommendedProductOverWhatsApp } from '../../Controllers/whatsappController';
+import { verifyWebhook, handleWebhook, sendRecommendedProductOverWhatsApp } from '@Controllers/whatsappController';
 
 const router = express.Router();
 
