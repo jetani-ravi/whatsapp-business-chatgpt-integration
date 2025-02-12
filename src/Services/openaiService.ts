@@ -29,8 +29,8 @@ export const getChatGPTResponse = async (
       tools: [{
         type: "function",
         function: {
-          name: "initiate_voice_call",
-          description: "Initiate a voice call to the customer",
+          name: "avviare_chiamata_vocale",
+          description: "Avvia una chiamata vocale al cliente",
           parameters: {
             type: "object",
             properties: {},

@@ -23,8 +23,8 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
   try {
     const { object, entry } = req.body;
 
-    console.log('handleWebhook_object____', object);
-    console.log('handleWebhook_entry____', entry);
+    console.log('handleWebhook_object____', JSON.stringify(object));
+    console.log('handleWebhook_entry____', JSON.stringify(entry));
 
     if (object !== "whatsapp_business_account") {
       console.log('Unhandled webhook object type:', object);
@@ -62,12 +62,18 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
               const from = message.from;
               const msg_body = message.text.body;
 
+              console.log('handleWebhook_from____', from);
+              console.log('handleWebhook_phone_number_id____', phone_number_id);
+
               let conversation = await Conversation.findOne({ phoneNumber: from });
               
               if (!conversation) {
                 // First interaction - create new conversation
                 conversation = await handleNewConversation(phone_number_id, from);
-                return await initiateVoiceCall(from);
+                conversation.from = from;
+                conversation.phoneNumberId = phone_number_id;
+
+                await initiateVoiceCall(from);
               } else {
                 // Detect intent for existing conversation
                 const { intent } = await detectIntent(msg_body);
@@ -118,7 +124,7 @@ const handleNewConversation = async (phone_number_id: string, from: string) => {
   await sendMessage(
     phone_number_id,
     from,
-    "Welcome to Roads Of Beauty! I'll call you right away for a personalized consultation."
+    "Benvenuto a Roads Of Beauty! Ti chiamerò subito per una consulenza personalizzata."
   );
 
   return conversation;
@@ -137,7 +143,7 @@ const handleChannelPreference = async (
     await sendMessage(
       phone_number_id,
       from,
-      "I'll call you right away for our consultation."
+      "Ti chiamerò subito per la nostra consulenza."
     );
   } else if (preference.includes('chat') || preference.includes('text')) {
     conversation.preferredChannel = 'chat';
@@ -148,7 +154,7 @@ const handleChannelPreference = async (
         .replace('{CUSTOMER_PHONE_NUMBER}', from)
     };
     const aiResponse = await getChatGPTResponse(message, from, systemMessage);
-    if (aiResponse) {
+    if (aiResponse?.content) {
       await sendMessage(
         phone_number_id,
         from,
@@ -215,11 +221,11 @@ const handleGeneralQuery = async (
 
   if (aiResponse.tool_calls) {  // Changed from toolCalls to tool_calls
     for (const toolCall of aiResponse.tool_calls) {
-      if (toolCall.function.name === 'initiate_voice_call') {
+      if (toolCall.function.name === 'avviare_chiamata_vocale') {
         await sendMessage(
           phone_number_id,
           from,
-          `I'll call you right away`
+          `Ti chiamerò subito`
         );
         await initiateVoiceCall(from);
         conversation.preferredChannel = 'voice';
@@ -279,7 +285,7 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
     );
 
     if (!toolCall) {
-      res.status(400).send('No product recommendations found');
+      res.status(400).send('Nessun prodotto raccomandato trovato');
       return;
     }
 

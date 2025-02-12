@@ -42,7 +42,7 @@ export const sendProductRecommendations = async (
   to: string,
   products: Array<{name: string, description: string, link: string}>
 ) => {
-  const message = `Here are your recommended products:\n\n${products.map((product, index) => (
+  const message = `Ecco i prodotti consigliati: \n\n${products.map((product, index) => (
     `${index + 1}. *${product.name}*\n${product.description}\n${product.link}\n`
   )).join('\n')}`;
 
