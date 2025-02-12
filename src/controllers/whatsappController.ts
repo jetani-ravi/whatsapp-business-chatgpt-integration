@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as whatsappService from '../services/whatsappService';
 import * as vapiService from '../services/vapiService';
 import * as openaiService from '../services/openaiService';
-import Conversation from '../Models/conversation.model';
+import Conversation from '../models/conversation.model';
 import SYSTEM_PROMPT from '../config/prompt.constant';
 import { ChatCompletionSystemMessageParam } from 'openai/resources/chat/completions';
 
