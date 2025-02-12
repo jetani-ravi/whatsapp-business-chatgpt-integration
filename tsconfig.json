@@ -23,7 +23,6 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "paths": {
-      "@Controllers/*": ["src/Controllers/*"],
       "@Models/*": ["src/Models/*"],
       "@Services/*": ["src/Services/*"],
       "@Routes/*": ["src/Routes/*"],

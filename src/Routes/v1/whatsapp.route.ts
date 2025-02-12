@@ -1,5 +1,5 @@
 import express from 'express';
-import { verifyWebhook, handleWebhook, sendRecommendedProductOverWhatsApp } from '@Controllers/whatsappController';
+import * as whatsappController from '../../Controllers/whatsappController';
 
 const router = express.Router();
 
@@ -9,8 +9,8 @@ const asyncHandler = (fn: any) => (req: any, res: any, next: any) => {
 };
 
 // Apply the routes with error handling
-router.get('/webhook', asyncHandler(verifyWebhook));
-router.post('/webhook', asyncHandler(handleWebhook));
-router.post('/send-recommendations', asyncHandler(sendRecommendedProductOverWhatsApp));
+router.get('/webhook', asyncHandler(whatsappController.verifyWebhook));
+router.post('/webhook', asyncHandler(whatsappController.handleWebhook));
+router.post('/send-recommendations', asyncHandler(whatsappController.sendRecommendedProductOverWhatsApp));
 
 export default router;
