@@ -315,5 +315,9 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
   }
 };
 
-export { verifyWebhook, handleWebhook, sendRecommendedProductOverWhatsApp };
+export default {
+  verifyWebhook,
+  handleWebhook,
+  sendRecommendedProductOverWhatsApp
+};
 
