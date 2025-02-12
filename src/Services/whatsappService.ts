@@ -48,3 +48,8 @@ export const sendProductRecommendations = async (
 
   return await sendMessage(phoneNumberId, to, message);
 };
+
+export default {
+  sendMessage,
+  sendProductRecommendations
+};

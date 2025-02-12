@@ -6,4 +6,4 @@ const router = express.Router();
 // Register WhatsApp routes
 router.use('/whatsapp', whatsappRoute);
 
-export default router;
+export { router };

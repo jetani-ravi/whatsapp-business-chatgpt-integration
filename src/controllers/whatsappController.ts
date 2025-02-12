@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import * as whatsappService from '../services/whatsappService';
-import * as vapiService from '../services/vapiService';
-import * as openaiService from '../services/openaiService';
+import { sendMessage, sendProductRecommendations } from '../services/whatsappService';
+import { initiateVoiceCall } from '../services/vapiService';
+import { detectIntent, getChatGPTResponse } from '../services/openaiService';
 import Conversation from '../models/conversation.model';
 import SYSTEM_PROMPT from '../config/prompt.constant';
 import { ChatCompletionSystemMessageParam } from 'openai/resources/chat/completions';
@@ -67,10 +67,10 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
               if (!conversation) {
                 // First interaction - create new conversation
                 conversation = await handleNewConversation(phone_number_id, from);
-                return await vapiService.initiateVoiceCall(from);
+                return await initiateVoiceCall(from);
               } else {
                 // Detect intent for existing conversation
-                const { intent } = await openaiService.detectIntent(msg_body);
+                const { intent } = await detectIntent(msg_body);
 
                 console.log('intent____', intent);
                 
@@ -115,7 +115,7 @@ const handleNewConversation = async (phone_number_id: string, from: string) => {
     }]
   });
 
-  await whatsappService.sendMessage(
+  await sendMessage(
     phone_number_id,
     from,
     "Welcome to Roads Of Beauty! I'll call you right away for a personalized consultation."
@@ -133,8 +133,8 @@ const handleChannelPreference = async (
   const preference = message.toLowerCase();
   if (preference.includes('voice') || preference.includes('call')) {
     conversation.preferredChannel = 'voice';
-    await vapiService.initiateVoiceCall(from);
-    await whatsappService.sendMessage(
+    await initiateVoiceCall(from);
+    await sendMessage(
       phone_number_id,
       from,
       "I'll call you right away for our consultation."
@@ -147,9 +147,9 @@ const handleChannelPreference = async (
         .replace('{CUSTOMER_NAME}', conversation.customerName || '')
         .replace('{CUSTOMER_PHONE_NUMBER}', from)
     };
-    const aiResponse = await openaiService.getChatGPTResponse(message, from, systemMessage);
+    const aiResponse = await getChatGPTResponse(message, from, systemMessage);
     if (aiResponse) {
-      await whatsappService.sendMessage(
+      await sendMessage(
         phone_number_id,
         from,
         aiResponse.content || ''
@@ -179,7 +179,7 @@ const handleChannelPreference = async (
 //     "Let's start the consultation. What's your main skin type?",
 //     from
 //   );
-//   await whatsappService.sendMessage(
+//   await (
 //     phone_number_id,
 //     from,
 //     aiResponse.content || ''
@@ -209,24 +209,24 @@ const handleGeneralQuery = async (
     { role: 'user', content: message }
   ];
 
-  const aiResponse = await openaiService.getChatGPTResponse(message, from, systemMessage, messages);
+  const aiResponse = await getChatGPTResponse(message, from, systemMessage, messages);
   
   if (!aiResponse) return;
 
   if (aiResponse.tool_calls) {  // Changed from toolCalls to tool_calls
     for (const toolCall of aiResponse.tool_calls) {
       if (toolCall.function.name === 'initiate_voice_call') {
-        await whatsappService.sendMessage(
+        await sendMessage(
           phone_number_id,
           from,
           `I'll call you right away`
         );
-        await vapiService.initiateVoiceCall(from);
+        await initiateVoiceCall(from);
         conversation.preferredChannel = 'voice';
       }
     }
   } else {
-    await whatsappService.sendMessage(
+    await sendMessage(
       phone_number_id,
       from,
       aiResponse.content || ''
@@ -302,7 +302,7 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
     }
 
     // Send recommendations via WhatsApp
-    await whatsappService.sendProductRecommendations(
+    await sendProductRecommendations(
       process.env['WHATSAPP_PHONE_NUMBER_ID'] || '',
       phoneNumber,
       products

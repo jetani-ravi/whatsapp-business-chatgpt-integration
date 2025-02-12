@@ -73,3 +73,8 @@ export const detectIntent = async (message: string): Promise<{
 
   return JSON.parse(response?.choices[0]?.message?.content || '{}');
 };
+export default {
+  getChatGPTResponse,
+  clearConversationContext,
+  detectIntent
+};

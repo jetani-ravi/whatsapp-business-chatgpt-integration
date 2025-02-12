@@ -32,3 +32,7 @@ export const initiateVoiceCall = async (customerNumber: string): Promise<void> =
     throw error;
   }
 }; 
+
+export default {
+  initiateVoiceCall
+};
