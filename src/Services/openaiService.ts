@@ -61,7 +61,7 @@ export const detectIntent = async (message: string): Promise<{
     messages: [
       {
         role: "system",
-        content: "You are an intent classifier. Classify the user message into one of these intents: channel_preference, general_question. Respond with JSON only."
+        content: "Sei un classificatore di intenti. Classifica il messaggio dell'utente in uno di questi intenti: channel_preference, general_question. Rispondi solo in formato JSON."
       },
       {
         role: "user",
