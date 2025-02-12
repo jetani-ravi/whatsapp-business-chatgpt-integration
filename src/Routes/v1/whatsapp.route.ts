@@ -1,5 +1,5 @@
 import express from 'express';
-import * as whatsappController from '../../Controllers/whatsappController';
+import * as whatsappController from '../../Controllers/whatsappcontroller';
 
 const router = express.Router();
 
