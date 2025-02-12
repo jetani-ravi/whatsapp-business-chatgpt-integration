@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { sendMessage, sendProductRecommendations } from '../services/whatsappService';
-import { initiateVoiceCall } from '../services/vapiService';
-import { detectIntent, getChatGPTResponse } from '../services/openaiService';
-import Conversation from '../models/conversation.model';
+import { sendMessage, sendProductRecommendations } from '../Services/whatsappService';
+import { initiateVoiceCall } from '../Services/vapiService';
+import { detectIntent, getChatGPTResponse } from '../Services/openaiService';
+import Conversation from '../Models/conversation.model';
 import SYSTEM_PROMPT from '../config/prompt.constant';
 import { ChatCompletionSystemMessageParam } from 'openai/resources/chat/completions';
 
