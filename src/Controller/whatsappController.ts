@@ -5,7 +5,6 @@ import * as openaiService from '../services/openaiService';
 import Conversation from '../Models/conversation.model';
 import SYSTEM_PROMPT from '../config/prompt.constant';
 import { ChatCompletionSystemMessageParam } from 'openai/resources/chat/completions';
-import { initiateVoiceCall } from '../services/vapiService';
 
 const MAX_CONVERSATION_HISTORY = 15;
 const verifyWebhook = (req: Request, res: Response): void => {
@@ -68,7 +67,7 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
               if (!conversation) {
                 // First interaction - create new conversation
                 conversation = await handleNewConversation(phone_number_id, from);
-                return await initiateVoiceCall(from);
+                return await vapiService.initiateVoiceCall(from);
               } else {
                 // Detect intent for existing conversation
                 const { intent } = await openaiService.detectIntent(msg_body);

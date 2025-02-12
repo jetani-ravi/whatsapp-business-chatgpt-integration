@@ -5,8 +5,6 @@ const openai = new OpenAI({
   apiKey: process.env['OPENAI_API_KEY'],
 });
 
-const MAX_CONVERSATION_HISTORY = 15; // Maximum number of messages to keep in history
-
 interface ConversationContext {
   messages: ChatCompletionMessageParam[];
   phoneNumber: string;
@@ -17,7 +15,7 @@ const conversationContexts = new Map<string, ConversationContext>();
 
 export const getChatGPTResponse = async (
   message: string, 
-  phoneNumber: string,
+  _phoneNumber: string,
   systemMessage: ChatCompletionSystemMessageParam,
   conversationHistory: Array<any> = []
 ) => {
