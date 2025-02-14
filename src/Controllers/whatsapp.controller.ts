@@ -137,7 +137,26 @@ const handleChannelPreference = async (
   from: string
 ) => {
   const preference = message.toLowerCase();
-  if (preference.includes('voice') || preference.includes('call')) {
+  const channelWords = [
+    "voce", 
+    "chiamata", 
+    "telefonata", 
+    "telefono", 
+    "chiamata vocale", 
+    "chiama", 
+    "chiamare", 
+    "telefonare", 
+    "in viva voce", 
+    "fare una chiamata", 
+    "ricevere una chiamata", 
+    "numero di telefono", 
+    "parlare al telefono", 
+    "rispondi alla chiamata", 
+    "mettere in attesa", 
+    "richiamare"
+  ];
+  
+  if (channelWords.some(word => preference.toLowerCase().trim().includes(word.toLowerCase().trim()))) {
     conversation.preferredChannel = 'voice';
     await initiateVoiceCall(from);
     await sendMessage(
@@ -145,7 +164,7 @@ const handleChannelPreference = async (
       from,
       "Ti chiamerò subito per la nostra consulenza."
     );
-  } else if (preference.includes('chat') || preference.includes('text')) {
+  } else if (preference.toLowerCase().includes('chat') || preference.toLowerCase().includes('text') || preference.toLowerCase().includes('whatsapp')) {
     conversation.preferredChannel = 'chat';
     const systemMessage: ChatCompletionSystemMessageParam = {
       role: 'system',
