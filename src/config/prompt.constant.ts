@@ -55,8 +55,7 @@ PRODOTTI
 am
 am
 
-link : https://roadsofbeauty.com/it-it/collections/all-in/products/lush-rehab-anti-pollution-cre
-am
+link : https://roadsofbeauty.com/it-it/collections/all-in/products/lush-rehab-anti-pollution-cream
 Benefici:
 Mix vincente: burro di karité e avocado per l'elasticità della pelle, curcuma per le proprietà
 antinfiammatorie e acido ialuronico e aloe per l'idratazione.

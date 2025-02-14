@@ -82,6 +82,7 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
                 
                 switch (intent) {
                   case 'channel_preference':
+                    // const extractedChannel = extractChannelFromMessage(msg_body);
                     await handleChannelPreference(conversation, msg_body, phone_number_id, from);
                     break;
                     
@@ -105,6 +106,14 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+// const extractChannelFromMessage = async(message: string, from: string): Promise<string> => {
+//   const systemMessage = `Extract the channel from the message : ${message}, give me only the channel name in lowercase channel name like voice, chat, whatsapp`;
+//   const aiResponse = await getChatGPTResponse(systemMessage, from, systemMessage as ChatCompletionSystemMessageParam);
+//   return aiResponse?.content || '';
+// }
+
+
 
 const handleNewConversation = async (phone_number_id: string, from: string) => {
   const conversation = await Conversation.create({
@@ -313,7 +322,10 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
       ? JSON.parse(toolCall.function.arguments) 
       : toolCall.function.arguments;
 
-    const products = args.recommendedProductList.map((item: any) => item.productList);
+    console.log('args____', JSON.stringify(args));
+    console.log('args____recommendedProductList', JSON.stringify(args.recommendedProductList));
+
+    const products = args.recommendedProductList.map((item: any) => item?.productList || item?.Items || item);
 
     const conversation = await Conversation.findOne({ phoneNumber });
     
