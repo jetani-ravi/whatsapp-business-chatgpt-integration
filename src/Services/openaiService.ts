@@ -73,8 +73,32 @@ export const detectIntent = async (message: string): Promise<{
 
   return JSON.parse(response?.choices[0]?.message?.content || '{}');
 };
+
+export const detectChannelPreferenceIntent = async (message: string): Promise<{
+  intent: 'voice' | 'whatsapp',
+  confidence: number
+}> => {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4-turbo-preview",
+    messages: [
+      {
+        role: "system",
+        content: `Sei un classificatore di intenti. Classifica il messaggio dell'utente in uno di questi intenti: whatsapp, chat, voce, 
+ - rileva l'intenzione dell'utente se l'utente non desidera chiamare, quindi la sua intenzione di rimanere in chat o whatsapp, rileva l'intenzione dell'utente in modo intelligente, risponde solo in formato JSON, è necessario classificare l'intenzione dell'utente in queste categorie "chat", "whatsapp", "voice"`
+      },
+      {
+        role: "user",
+        content: message
+      }
+    ],
+    response_format: { type: "json_object" }
+  });
+
+  return JSON.parse(response?.choices[0]?.message?.content || '{}');
+};
 export default {
   getChatGPTResponse,
   clearConversationContext,
-  detectIntent
+  detectIntent,
+  detectChannelPreferenceIntent
 };

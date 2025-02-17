@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { sendMessage, sendProductRecommendations } from '../Services/whatsappService';
 import { initiateVoiceCall } from '../Services/vapiService';
-import { detectIntent, getChatGPTResponse } from '../Services/openaiService';
+import { detectIntent, detectChannelPreferenceIntent, getChatGPTResponse } from '../Services/openaiService';
 import Conversation from '../Models/conversation.model';
 import SYSTEM_PROMPT from '../config/prompt.constant';
 import { ChatCompletionSystemMessageParam } from 'openai/resources/chat/completions';
@@ -145,27 +145,9 @@ const handleChannelPreference = async (
   phone_number_id: string,
   from: string
 ) => {
-  const preference = message.toLowerCase();
-  const channelWords = [
-    "voce", 
-    "chiamata", 
-    "telefonata", 
-    "telefono", 
-    "chiamata vocale", 
-    "chiama", 
-    "chiamare", 
-    "telefonare", 
-    "in viva voce", 
-    "fare una chiamata", 
-    "ricevere una chiamata", 
-    "numero di telefono", 
-    "parlare al telefono", 
-    "rispondi alla chiamata", 
-    "mettere in attesa", 
-    "richiamare"
-  ];
-  
-  if (channelWords.some(word => preference.toLowerCase().trim().includes(word.toLowerCase().trim()))) {
+  const userPreference = await detectChannelPreferenceIntent(message);
+  console.log('userPreference____', userPreference);
+  if (userPreference.intent === 'voice') {
     conversation.preferredChannel = 'voice';
     await initiateVoiceCall(from);
     await sendMessage(
@@ -173,8 +155,8 @@ const handleChannelPreference = async (
       from,
       "Ti chiamerò subito per la nostra consulenza."
     );
-  } else if (preference.toLowerCase().includes('chat') || preference.toLowerCase().includes('text') || preference.toLowerCase().includes('whatsapp')) {
-    conversation.preferredChannel = 'chat';
+  } else if (userPreference.intent === 'whatsapp' || userPreference.intent === 'chat') {
+    conversation.preferredChannel = 'whatsapp';
     const systemMessage: ChatCompletionSystemMessageParam = {
       role: 'system',
       content: SYSTEM_PROMPT

@@ -6,7 +6,7 @@ export interface IConversation extends Document {
   from: string;
   to: string;
   phoneNumberId: string;
-  preferredChannel?: 'voice' | 'chat';
+  preferredChannel?: 'voice' | 'chat' | 'whatsapp';
   lastInteractionDate: Date;
   status: 'active' | 'awaiting_preference' | 'completed';
   recommendedProducts?: string[];
@@ -22,7 +22,7 @@ const ConversationSchema: Schema = new Schema({
   from: { type: String },
   to: { type: String },
   phoneNumberId: { type: String },
-  preferredChannel: { type: String, enum: ['voice', 'chat'] },
+  preferredChannel: { type: String, enum: ['voice', 'chat','whatsapp'] },
   lastInteractionDate: { type: Date, required: true },
   status: { type: String, enum: ['active', 'awaiting_preference', 'completed'], default: 'active' },
   recommendedProducts: [{ type: String }],
