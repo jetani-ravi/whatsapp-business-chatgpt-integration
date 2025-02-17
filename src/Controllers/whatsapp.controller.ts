@@ -294,11 +294,6 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
       (call: any) => call.function.name === 'sendProductRecommendations'
     );
 
-    if (!toolCall) {
-      res.status(400).send('Nessun prodotto raccomandato trovato');
-      return;
-    }
-
     // Parse the arguments string to get the product list
     const args = typeof toolCall.function.arguments === 'string' 
       ? JSON.parse(toolCall.function.arguments) 
@@ -317,7 +312,7 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
       
       // Update conversation with recommended products
       conversation.recommendedProducts = serializedProducts;
-      await conversation.save();
+      conversation.save();
     }
 
     // Send recommendations via WhatsApp
