@@ -281,6 +281,7 @@ const handleGeneralQuery = async (
 
 const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log('sendRecommendedProductOverWhatsApp____Body', JSON.stringify(req.body));
     const { message } = req.body;
     
     // Extract phone number and remove '+' if present
@@ -300,12 +301,19 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
       : toolCall.function.arguments;
 
     console.log('args____', JSON.stringify(args));
-    console.log('args____recommendedProductList', JSON.stringify(args.recommendedProductList));
 
-    const products = args.recommendedProductList.map((item: any) => item?.productList || item?.Items || item);
+    
+    let products = [];
+    if(!args?.recommendedProductList || args?.recommendedProductList?.length === 0) {
+      console.error('No products found');
+      res.status(200).send('No recommended products found');
+      return;
+    } 
+    console.log('args____recommendedProductList', JSON.stringify(args.recommendedProductList));
+    products = args.recommendedProductList.map((item: any) => item?.productList || item?.Items || item);
 
     const conversation = await Conversation.findOne({ phoneNumber });
-    
+    console.log('conversation____', JSON.stringify(conversation));
     if (conversation) {
       // Convert products to string format before saving
       const serializedProducts = products.map((product: any) => JSON.stringify(product));
