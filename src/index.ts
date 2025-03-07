@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 // Connect to MongoDB
 connectDatabase();
 
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req: Request, _res: Response, next: NextFunction) => {
   console.log('__body', req.body)
   next()
 });
