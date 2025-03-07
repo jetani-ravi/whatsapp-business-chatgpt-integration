@@ -18,7 +18,29 @@ export const initiateVoiceCall = async (customerNumber: string): Promise<void> =
         phoneNumberId: VAPI_PHONE_NUMBER_ID,
         customer: {
           number: customerNumber,
-        }
+          numberE164CheckEnabled: true
+        },
+        assistantOverrides: {
+        voicemailDetection: {
+            provider: "twilio",
+            enabled: true,
+            voicemailDetectionTypes: [
+                "machine_end_beep",
+                "machine_end_silence"
+            ],
+            machineDetectionTimeout: 10,
+            machineDetectionSpeechThreshold: 1500,
+            machineDetectionSpeechEndThreshold: 500,
+            machineDetectionSilenceTimeout: 5000
+        },
+        firstMessageMode: "assistant-speaks-first",
+        transportConfigurations: [
+            {
+                provider: "twilio",
+                timeout: 60
+            }
+        ]
+    }
       },
       {
         headers: {
