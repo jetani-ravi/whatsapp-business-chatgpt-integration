@@ -304,13 +304,22 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
 
     
     let products = [];
-    if(!args?.recommendedProductList || args?.recommendedProductList?.length === 0) {
+    if(!args?.recommendedProductList) {
       console.error('No products found');
       res.status(200).send('No recommended products found');
       return;
     } 
+    
     console.log('args____recommendedProductList', JSON.stringify(args.recommendedProductList));
-    products = args.recommendedProductList.map((item: any) => item?.productList || item?.Items || item);
+    
+    // Handle both array and object formats for recommendedProductList
+    if (Array.isArray(args.recommendedProductList)) {
+      // If recommendedProductList is already an array
+      products = args.recommendedProductList.map((item: any) => item?.productList || item?.Items || item);
+    } else {
+      // If recommendedProductList is an object, wrap it in an array
+      products = [args.recommendedProductList];
+    }
 
     const conversation = await Conversation.findOne({ phoneNumber });
     console.log('conversation____', JSON.stringify(conversation));
