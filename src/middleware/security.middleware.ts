@@ -62,11 +62,11 @@ export const validateRequestMethod = (req: Request, res: Response, next: NextFun
     return;
   }
   
-  // Allow GET requests for health checks
-  if (req.path === '/health' && req.method === 'GET') {
-    next();
-    return;
-  }
+//   // Allow GET requests for health checks
+//   if (req.path === '/health' && req.method === 'GET') {
+//     next();
+//     return;
+//   }
   
   // For all other API endpoints, only allow POST
   if (req.method !== 'POST') {
