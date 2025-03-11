@@ -11,14 +11,20 @@ import morgan from 'morgan';
 
 import {router} from './Routes/v1';
 import { connectDatabase } from './config/database';
-
+import { blockSensitiveFiles, validateApiKey, validateRequestMethod, rateLimit } from './middleware/security.middleware';
+import { requestLogger, bodyLogger } from './middleware/logging.middleware';
 
 // Load environment variables
 
 const app: Express = express();
 const port = process.env['PORT'] || 3000;
 
-// Middleware
+// Apply security middleware
+app.use(blockSensitiveFiles);
+app.use(rateLimit);
+app.use(requestLogger);
+
+// Standard middleware
 app.use(helmet()); // Security headers
 app.use(cors()); // Enable CORS
 app.use(morgan('dev')); // HTTP request logger
@@ -33,10 +39,15 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 // Connect to MongoDB
 connectDatabase();
 
-app.use((req: Request, _res: Response, next: NextFunction) => {
-  console.log('__body', req.body)
-  next()
-});
+// Use body logger instead of inline middleware
+app.use(bodyLogger);
+
+// Apply API key validation to all API routes
+app.use('/api/v1', validateApiKey);
+
+// // Apply method validation to API routes
+// app.use('/api/v1', validateRequestMethod);
+
 // API Routes
 app.use('/api/v1', router);
 
@@ -44,6 +55,7 @@ app.use('/api/v1', router);
 app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
 // 404 Handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({
