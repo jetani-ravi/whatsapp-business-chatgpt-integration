@@ -45,8 +45,8 @@ app.use(bodyLogger);
 // Apply API key validation to all API routes
 app.use('/api/v1', validateApiKey);
 
-// // Apply method validation to API routes
-// app.use('/api/v1', validateRequestMethod);
+// Apply method validation to API routes
+app.use('/api/v1', validateRequestMethod);
 
 // API Routes
 app.use('/api/v1', router);
