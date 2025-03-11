@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 /**
  * Middleware to block access to sensitive files and directories
  */
-export const blockSensitiveFiles = (req: Request, res: Response, next: NextFunction) => {
+export const blockSensitiveFiles = (req: Request, res: Response, next: NextFunction): void => {
   const blockedPaths = [
     /\.git/,
     /\.env/,
@@ -22,10 +22,11 @@ export const blockSensitiveFiles = (req: Request, res: Response, next: NextFunct
   
   if (blockedPaths.some(pattern => pattern.test(url))) {
     console.warn(`Blocked access attempt to sensitive path: ${url}`);
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       message: 'Access Forbidden',
     });
+    return;
   }
   
   next();
@@ -34,16 +35,17 @@ export const blockSensitiveFiles = (req: Request, res: Response, next: NextFunct
 /**
  * Middleware to validate API key
  */
-export const validateApiKey = (req: Request, res: Response, next: NextFunction) => {
-  const apiKey = req.headers['x-api-key'] || req.query.apiKey;
+export const validateApiKey = (req: Request, res: Response, next: NextFunction): void => {
+  const apiKey = req.headers['x-api-key'] || req.query.apiKey as string;
   const validApiKey = process.env.X_API_KEY;
   
   if (!apiKey || apiKey !== validApiKey) {
     console.warn('Invalid API key attempt');
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       message: 'Unauthorized: Invalid API Key',
     });
+    return;
   }
   
   next();
@@ -53,24 +55,27 @@ export const validateApiKey = (req: Request, res: Response, next: NextFunction) 
  * Middleware to validate request methods
  * Only allows POST requests except for specific endpoints
  */
-export const validateRequestMethod = (req: Request, res: Response, next: NextFunction) => {
+export const validateRequestMethod = (req: Request, res: Response, next: NextFunction): void => {
   // Allow GET requests for webhook verification
   if (req.path.includes('/whatsapp/webhook') && req.method === 'GET') {
-    return next();
+    next();
+    return;
   }
   
   // Allow GET requests for health checks
   if (req.path === '/health' && req.method === 'GET') {
-    return next();
+    next();
+    return;
   }
   
   // For all other API endpoints, only allow POST
   if (req.method !== 'POST') {
-    return res.status(405).json({
+    res.status(405).json({
       success: false,
       message: 'Method Not Allowed',
       allowedMethods: ['POST']
     });
+    return;
   }
   
   next();
@@ -84,7 +89,7 @@ const requestCounts: Record<string, { count: number, timestamp: number }> = {};
 const WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 100; // Max requests per minute
 
-export const rateLimit = (req: Request, res: Response, next: NextFunction) => {
+export const rateLimit = (req: Request, res: Response, next: NextFunction): void => {
   const ip = req.ip || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
   
@@ -104,11 +109,12 @@ export const rateLimit = (req: Request, res: Response, next: NextFunction) => {
   
   // Check if rate limit exceeded
   if (requestCounts[ip].count > MAX_REQUESTS) {
-    return res.status(429).json({
+    res.status(429).json({
       success: false,
       message: 'Too Many Requests',
       retryAfter: Math.ceil((requestCounts[ip].timestamp + WINDOW_MS - now) / 1000)
     });
+    return;
   }
   
   next();

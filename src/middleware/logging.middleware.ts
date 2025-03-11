@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
  * Enhanced request logger middleware
  * Logs detailed information about each request
  */
-export const requestLogger = (req: Request, res: Response, next: NextFunction) => {
+export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
   const start = Date.now();
   const requestId = Math.random().toString(36).substring(2, 15);
   
@@ -46,7 +46,7 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
       }));
     }
     
-    // Call the original end method
+    // Call the original end method and return its result
     return originalEnd.call(this, chunk, encoding, callback);
   };
   
@@ -57,7 +57,7 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
  * Body logger middleware
  * Logs request body for debugging purposes
  */
-export const bodyLogger = (req: Request, _res: Response, next: NextFunction) => {
+export const bodyLogger = (req: Request, _res: Response, next: NextFunction): void => {
   // Don't log bodies for sensitive endpoints
   const sensitiveEndpoints = ['/login', '/auth', '/password'];
   if (!sensitiveEndpoints.some(endpoint => req.path.includes(endpoint))) {
