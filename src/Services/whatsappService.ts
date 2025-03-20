@@ -52,7 +52,7 @@ export const sendProductRecommendations = async (
     `${index + 1}. *${product.name}*\n${product.description}\n${product.link}\n`
   )).join('\n')}`;
 
-  return await sendMessage(phoneNumberId, to, message);
+  return sendMessage(phoneNumberId, to, message);
 };
 
 export default {

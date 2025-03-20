@@ -306,7 +306,7 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
     let products = [];
     if(!args?.recommendedProductList) {
       console.error('No products found');
-      res.status(200).send('No recommended products found');
+      res.status(200).send({'message': 'No recommended products found'});
       return;
     } 
     
@@ -339,7 +339,7 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
       products
     );
 
-    res.status(200).send('Recommendations sent successfully');
+    res.status(200).send({'message': 'Product link has been sent successfully'});
   } catch (error) {
     console.error('Error sending recommendations:', error);
     res.status(500).send('Error sending recommendations');
