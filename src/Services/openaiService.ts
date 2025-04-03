@@ -37,7 +37,25 @@ export const getChatGPTResponse = async (
             required: []
           }
         }
-      }]
+      },
+      {
+        type: "function",
+        function: {
+          name: "nome_cliente_del_negozio",
+          description: "memorizzare il nome del cliente che viene comunicato dal cliente",
+          parameters: {
+            type: "object",
+            properties: {
+              first_name: {
+                type: "string",
+                description: "il nome del cliente"
+              }
+            },
+            required: ["first_name"]
+          }
+        }
+      }
+    ]
     });
 
     // Ensure we always return a message, even if it's null

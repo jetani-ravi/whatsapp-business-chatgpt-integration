@@ -9,8 +9,12 @@ const asyncHandler = (fn: any) => (req: any, res: any, next: any) => {
 };
 
 // Apply the routes with error handling
+
 router.get('/webhook', asyncHandler(whatsappController.verifyWebhook));
+router.post('/initiate-call', asyncHandler(whatsappController.initiateFollowUpCall));
+
 router.post('/webhook', asyncHandler(whatsappController.handleWebhook));
 router.post('/send-recommendations', asyncHandler(whatsappController.sendRecommendedProductOverWhatsApp));
 
+router.post('/follow-up', asyncHandler(whatsappController.sendFollowUpMessage));
 export default router;

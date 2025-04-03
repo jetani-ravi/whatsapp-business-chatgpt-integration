@@ -11,8 +11,8 @@ import morgan from 'morgan';
 
 import {router} from './Routes/v1';
 import { connectDatabase } from './config/database';
-import { blockSensitiveFiles, validateRequestMethod, rateLimit } from './middleware/security.middleware';
-import { requestLogger, bodyLogger } from './middleware/logging.middleware';
+import { blockSensitiveFiles, rateLimit, validateRequestMethod } from './middleware/security.middleware';
+import { bodyLogger, requestLogger } from './middleware/logging.middleware';
 
 // Load environment variables
 
@@ -47,6 +47,7 @@ app.use(bodyLogger);
 
 // Apply method validation to API routes
 app.use('/api/v1', validateRequestMethod);
+
 
 // API Routes
 app.use('/api/v1', router);

@@ -20,6 +20,7 @@ const ConversationSchema: Schema = new Schema({
   phoneNumber: { type: String, required: true, unique: true },
   isFirstInteraction: { type: Boolean, default: true },
   from: { type: String },
+  customerName: { type: String },
   to: { type: String },
   phoneNumberId: { type: String },
   preferredChannel: { type: String, enum: ['voice', 'chat','whatsapp'] },

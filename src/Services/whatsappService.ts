@@ -15,14 +15,14 @@ export const sendMessage = async (
         recipient_type: 'individual',
         to: to,
         type: 'text',
-        text: { 
+        text: {
           preview_url: false,
-          body: message 
+          body: message,
         },
       },
       {
         headers: {
-          'Authorization': `Bearer ${process.env['WHATSAPP_TOKEN']}`,
+          Authorization: `Bearer ${process.env['WHATSAPP_TOKEN']}`,
           'Content-Type': 'application/json',
         },
       }
@@ -33,7 +33,8 @@ export const sendMessage = async (
 
     return response.data;
   } catch (error: any) {
-    const errorMessage = error?.response?.data?.error?.message || 
+    const errorMessage =
+      error?.response?.data?.error?.message ||
       'Something went wrong while sending the WhatsApp message!';
     console.error('Error sending WhatsApp message:', errorMessage);
     console.error('Error sending WhatsApp message:___', error);
@@ -44,18 +45,72 @@ export const sendMessage = async (
 export const sendProductRecommendations = async (
   phoneNumberId: string,
   to: string,
-  products: Array<{name: string, description: string, link: string}>
+  products: Array<{ name: string; description: string; link: string }>
 ) => {
   console.log('Sending product recommendations...', phoneNumberId, to);
   console.log('products____', JSON.stringify(products));
-  const message = `Ecco i prodotti consigliati: \n\n${products.map((product, index) => (
-    `${index + 1}. *${product.name}*\n${product.description}\n${product.link}\n`
-  )).join('\n')}`;
+  const message = `Ecco i prodotti consigliati: \n\n${products
+    .map(
+      (product, index) =>
+        `${index + 1}. *${product.name}*\n${product.description}\n${product.link}\n`
+    )
+    .join('\n')}`;
 
   return sendMessage(phoneNumberId, to, message);
 };
 
+export const sendWhatsAppFollowUpMessage = async (
+  phoneNumberId: string,
+  to: string,
+  name: string
+) => {
+  try {
+    const headers = {
+      Authorization: `Bearer ${process.env['WHATSAPP_TOKEN']}`,
+      'Content-Type': 'application/json',
+    };
+    const templateName = process.env['FOLLOW_UP_TEMPLATE'];
+    const data = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: to,
+      type: 'template',
+      template: {
+        name: templateName,
+        language: {
+          code: 'it',
+        },
+        components: [
+          {
+            type: 'body',
+            parameters: [
+              {
+                type: 'text',
+                parameter_name: 'name',
+                text: name,
+              },
+            ],
+          },
+        ],
+      },
+    };
+    const response = await axios.post(`${WHATSAPP_API_URL}/${phoneNumberId}/messages`, data, {
+      headers,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.error?.message ||
+      'Something went wrong while sending the WhatsApp message!';
+    console.error('Error sending WhatsApp message:', errorMessage);
+    console.error('Error sending WhatsApp message:___', error);
+    throw new Error(errorMessage);
+  }
+};
+
 export default {
   sendMessage,
-  sendProductRecommendations
+  sendWhatsAppFollowUpMessage,
+  sendProductRecommendations,
 };
