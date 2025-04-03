@@ -9,6 +9,7 @@ export const blockSensitiveFiles = (req: Request, res: Response, next: NextFunct
     /\.env/,
     /node_modules/,
     /\.config/,
+    /\.env\.local/,
     /\.ssh/,
     /\.bash_history/,
     /package-lock\.json/,
@@ -87,7 +88,7 @@ export const validateRequestMethod = (req: Request, res: Response, next: NextFun
  */
 const requestCounts: Record<string, { count: number, timestamp: number }> = {};
 const WINDOW_MS = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 100; // Max requests per minute
+const MAX_REQUESTS = 60; // Max requests per minute
 
 export const rateLimit = (req: Request, res: Response, next: NextFunction): void => {
   const ip = req.ip || req.socket.remoteAddress || 'unknown';
