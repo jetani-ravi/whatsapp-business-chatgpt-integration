@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { z } from 'zod';
+// import { z } from 'zod';
 
 // Define the supported LLM providers
 export type LLMProvider = 'anthropic';
@@ -55,12 +55,12 @@ const tools: Anthropic.Tool[] = [
 ];
 
 // Define the interface for Anthropic tool usage in the response
-interface AnthropicToolUse {
-  id: string;
-  type: string;
-  name: string;
-  input: Record<string, any>;
-}
+// interface AnthropicToolUse {
+//   id: string;
+//   type: string;
+//   name: string;
+//   input: Record<string, any>;
+// }
 
 // Helper function to extract JSON from possibly markdown-wrapped content
 const extractJsonFromText = (text: string): any => {
@@ -131,11 +131,11 @@ export class LLMService {
     }).filter(msg => msg.role !== 'system');
   }
 
-  // Extract system message from conversation history
-  private extractSystemMessage(messages: any[]): string | undefined {
-    const systemMsg = messages.find(msg => msg.role === 'system');
-    return systemMsg?.content;
-  }
+  // // Extract system message from conversation history
+  // private extractSystemMessage(messages: any[]): string | undefined {
+  //   const systemMsg = messages.find(msg => msg.role === 'system');
+  //   return systemMsg?.content;
+  // }
 
   // Get a response from the LLM with retry logic
   public async getResponse(
@@ -240,7 +240,7 @@ export class LLMService {
 
   // Detect intent using the LLM with retry logic
   public async detectIntent(message: string): Promise<IntentResponse> {
-    let lastError;
+    // let lastError;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         const systemMessage = 'Sei un classificatore di intenti. Classifica il messaggio dell\'utente in uno di questi intenti: channel_preference, general_question. Rispondi solo in formato JSON con i campi "intent" e "confidence" (un numero tra 0 e 1).';
@@ -281,7 +281,7 @@ export class LLMService {
         }
       } catch (error: any) {
         console.error(`Error attempt ${attempt}/${MAX_RETRIES} detecting intent with ${this.provider}:`, error);
-        lastError = error;
+        // lastError = error;
         
         // Check if it's an overloaded error (529) or rate limit error
         if (error?.status === 529 || error?.status === 429) {
@@ -310,7 +310,7 @@ export class LLMService {
 
   // Detect channel preference using the LLM with retry logic
   public async detectChannelPreference(message: string): Promise<ChannelPreferenceResponse> {
-    let lastError;
+    // let lastError;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         const systemMessage = `Sei un classificatore di intenti. Classifica il messaggio dell'utente in uno di questi intenti: whatsapp, chat, voce. 
@@ -352,7 +352,7 @@ export class LLMService {
         }
       } catch (error: any) {
         console.error(`Error attempt ${attempt}/${MAX_RETRIES} detecting channel preference with ${this.provider}:`, error);
-        lastError = error;
+        // lastError = error;
         
         // Check if it's an overloaded error (529) or rate limit error
         if (error?.status === 529 || error?.status === 429) {
