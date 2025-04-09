@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@langchain/anthropic": "^0.3.16",
     "axios": "^1.6.2",
     "body-parser": "^1.19.0",
     "compression": "^1.7.5",
@@ -15,7 +17,8 @@
     "mongoose": "^8.9.6",
     "morgan": "^1.10.0",
     "openai": "^4.0.0",
-    "pm2": "^5.4.3"
+    "pm2": "^5.4.3",
+    "zod": "^3.22.4"
   },
   "engines": {
     "node": ">=20.17.0",

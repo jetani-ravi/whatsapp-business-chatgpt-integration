@@ -1,64 +1,80 @@
-# WhatsApp Voice Agents Integration
+# WhatsApp Business ChatGPT Integration
 
-A Node.js application that integrates WhatsApp messaging with OpenAI's capabilities to create an intelligent voice-based chat agent.
+This project integrates WhatsApp Business API with ChatGPT to provide automated customer service and product recommendations.
 
 ## Features
 
 - WhatsApp message handling
-- Voice message processing
-- Integration with OpenAI API
-- TypeScript support
-- Production-ready with PM2 process management
+- Intent detection
+- Channel preference detection (voice, WhatsApp, chat)
+- Product recommendations
+- Follow-up calls and messages
+- Conversation history tracking
 
-## Prerequisites
+## LLM Service Architecture
 
-Before running this application, make sure you have the following installed:
-- Node.js (v14 or higher)
-- Yarn or npm
-- PM2 (for production deployment)
+The project now uses an abstract LLM service built with LangChain, which allows for:
+
+- Model-agnostic implementation
+- Easy switching between different LLM providers
+- Structured output parsing
+- Consistent interface for all LLM operations
+
+### Supported LLM Providers
+
+Currently, the following LLM providers are supported:
+
+- OpenAI (GPT-4 Turbo)
+
+The architecture is designed to be easily extended to support additional providers in the future.
+
+## Environment Variables
+
+Create a `.env` file with the following variables:
+
+```
+OPENAI_API_KEY=your_openai_api_key
+VERIFY_TOKEN=your_webhook_verify_token
+WHATSAPP_PHONE_NUMBER_ID=your_whatsapp_phone_number_id
+LLM_PROVIDER=openai
+```
 
 ## Installation
 
-1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/whatsapp-openai-integration.git
-
-
-3. Create a `.env` file in the root directory and add the following configurations:
-NODE_ENV=development
-PORT=3000
-OPENAI_API_KEY=your_openai_api_key
-WHATSAPP_TOKEN=your_whatsapp_token
-VERIFY_TOKEN=your_verify_token
-
+npm install
+```
 
 ## Development
 
-To run the application in development mode:
-
 ```bash
-yarn dev
-# or
 npm run dev
 ```
 
-This will start the application with hot-reload enabled.
-
-## Production Deployment
-
-To build and start the application in production:
+## Production
 
 ```bash
-# Build the application
-yarn compile
-# or
-npm run compile
-
-# Start with PM2
-yarn start
-# or
-npm run start
+npm run build
+npm start
 ```
+
+## Using PM2 for Process Management
+
+```bash
+npm run pm2:start
+```
+
+## Extending the LLM Service
+
+To add support for additional LLM providers:
+
+1. Update the `LLMProvider` type in `src/Services/llmService.ts`
+2. Add the provider's initialization logic in the `initializeModel` method
+3. Install the necessary dependencies
+
+## License
+
+ISC
 
 ## Project Structure
 

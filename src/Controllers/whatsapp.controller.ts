@@ -4,14 +4,9 @@ import {
   initiateFollowUpCall as initiateFollowUpCallService,
   initiateVoiceCall,
 } from '../Services/vapiService';
-import {
-  detectIntent,
-  detectChannelPreferenceIntent,
-  getChatGPTResponse,
-} from '../Services/openaiService';
+import llmService from '../Services/llmService';
 import Conversation from '../Models/conversation.model';
 import SYSTEM_PROMPT from '../config/prompt.constant';
-import { ChatCompletionSystemMessageParam } from 'openai/resources/chat/completions';
 
 const MAX_CONVERSATION_HISTORY = 15;
 const verifyWebhook = (req: Request, res: Response): void => {
@@ -150,13 +145,12 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
                 await initiateVoiceCall(from);
               } else {
                 // Detect intent for existing conversation
-                const { intent } = await detectIntent(msg_body);
+                const { intent } = await llmService.detectIntent(msg_body);
 
                 console.log('intent____', intent);
 
                 switch (intent) {
                   case 'channel_preference':
-                    // const extractedChannel = extractChannelFromMessage(msg_body);
                     await handleChannelPreference(conversation, msg_body, phone_number_id, from);
                     break;
 
@@ -181,9 +175,9 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// const extractChannelFromMessage = async(message: string, from: string): Promise<string> => {
+// const extractChannelFromMessage = async(message: string): Promise<string> => {
 //   const systemMessage = `Extract the channel from the message : ${message}, give me only the channel name in lowercase channel name like voice, chat, whatsapp`;
-//   const aiResponse = await getChatGPTResponse(systemMessage, from, systemMessage as ChatCompletionSystemMessageParam);
+//   const aiResponse = await llmService.getResponse(message, systemMessage);
 //   return aiResponse?.content || '';
 // }
 
@@ -219,7 +213,7 @@ const handleChannelPreference = async (
   phone_number_id: string,
   from: string
 ) => {
-  const userPreference = await detectChannelPreferenceIntent(message);
+  const userPreference = await llmService.detectChannelPreference(message);
   console.log('userPreference____', userPreference);
   if (userPreference.intent === 'voice') {
     conversation.preferredChannel = 'voice';
@@ -234,14 +228,11 @@ const handleChannelPreference = async (
     await sendMessage(phone_number_id, from, 'Ti chiamerò subito per la nostra consulenza.');
   } else if (userPreference.intent === 'whatsapp' || userPreference.intent === 'chat') {
     conversation.preferredChannel = 'whatsapp';
-    const systemMessage: ChatCompletionSystemMessageParam = {
-      role: 'system',
-      content: SYSTEM_PROMPT.replace('{CUSTOMER_NAME}', conversation.customerName || '').replace(
-        '{CUSTOMER_PHONE_NUMBER}',
-        from
-      ),
-    };
-    const aiResponse = await getChatGPTResponse(message, from, systemMessage);
+    const systemMessage = SYSTEM_PROMPT.replace('{CUSTOMER_NAME}', conversation.customerName || '').replace(
+      '{CUSTOMER_PHONE_NUMBER}',
+      from
+    );
+    const aiResponse = await llmService.getResponse(message, systemMessage);
     if (aiResponse?.content) {
       await sendMessage(phone_number_id, from, aiResponse.content || '');
     }
@@ -299,10 +290,7 @@ const handleGeneralQuery = async (
   const conversationSummary = getConversationSummary(conversation);
 
   const prompt = getSystemPrompt(customerName, conversationSummary);
-  const systemMessage: ChatCompletionSystemMessageParam = {
-    role: 'system',
-    content: prompt,
-  };
+  const systemMessage = prompt;
 
   const variableValues = {
     first_name: customerName,
@@ -313,13 +301,17 @@ const handleGeneralQuery = async (
     .filter((msg: any) => msg.role !== 'system')
     .slice(-MAX_CONVERSATION_HISTORY);
 
-  const messages = [systemMessage, ...recentMessages, { role: 'user', content: message }];
+  const messages = [
+    { role: 'system', content: systemMessage },
+    ...recentMessages,
+    { role: 'user', content: message }
+  ];
 
-  const aiResponse = await getChatGPTResponse(message, from, systemMessage, messages);
-
+  const aiResponse = await llmService.getResponse(message, systemMessage, messages);
+  console.log('aiResponse____', JSON.stringify(aiResponse));
   if (!aiResponse) return;
 
-  if (aiResponse.tool_calls) {
+  if (aiResponse.tool_calls && aiResponse.tool_calls.length > 0) {
     // Changed from toolCalls to tool_calls
     for (const toolCall of aiResponse.tool_calls) {
       if (toolCall.function.name === 'avviare_chiamata_vocale') {
@@ -335,11 +327,8 @@ const handleGeneralQuery = async (
 
         // Get follow-up response from GPT after saving customer name
         const followUpMessage = "Grazie! Ora che ho il tuo nome, iniziamo a trovare i prodotti per la cura della pelle perfetti per te. Qual è il tuo tipo di pelle principale? (secca/grassa/mista/sensibile)";
-        const systemMessage: ChatCompletionSystemMessageParam = {
-          role: 'system',
-          content: getSystemPrompt(customerName, getConversationSummary(conversation))
-        };
-        const aiResponse = await getChatGPTResponse(followUpMessage, from, systemMessage);
+        const systemMessage = getSystemPrompt(customerName, getConversationSummary(conversation));
+        const aiResponse = await llmService.getResponse(followUpMessage, systemMessage);
         if (aiResponse?.content) {
           await sendMessage(phone_number_id, from, aiResponse.content);
         }
