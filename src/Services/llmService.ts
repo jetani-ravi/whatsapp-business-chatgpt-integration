@@ -128,7 +128,9 @@ export class LLMService {
         role: msg.role === 'user' ? 'user' : 'assistant',
         content: msg.content
       };
-    }).filter(msg => msg.role !== 'system');
+    })
+    .filter(msg => msg.role !== 'system')
+    .filter(msg => msg.content && msg.content.trim() !== ''); // Filter out messages with empty content
   }
 
   // // Extract system message from conversation history
@@ -153,17 +155,24 @@ export class LLMService {
         
         if (conversationHistory.length > 0) {
           // If we have conversation history, use it
-          // Convert conversation history to Anthropic messages
-          messages = this.convertToAnthropicMessages(conversationHistory);
+          // Convert conversation history to Anthropic messages and filter out empty messages
+          messages = this.convertToAnthropicMessages(
+            conversationHistory.filter(msg => msg.content && msg.content.trim() !== '')
+          );
           
           // Add the current message if it's not already included in the history
           const lastMessage = conversationHistory[conversationHistory.length - 1];
-          if (lastMessage?.role !== 'user' || lastMessage?.content !== message) {
+          if ((lastMessage?.role !== 'user' || lastMessage?.content !== message) && message.trim() !== '') {
             messages.push({ role: 'user', content: message });
           }
-        } else {
-          // For new conversations, just add the user's message
+        } else if (message.trim() !== '') {
+          // For new conversations, just add the user's message if it's not empty
           messages.push({ role: 'user', content: message });
+        }
+
+        // Ensure there's at least one message
+        if (messages.length === 0) {
+          throw new Error("Cannot make Anthropic API call with empty messages array");
         }
 
         // Call Anthropic API with tools
@@ -220,6 +229,21 @@ export class LLMService {
       } catch (error: any) {
         console.error(`Error attempt ${attempt}/${MAX_RETRIES} getting response from ${this.provider}:`, error);
         lastError = error;
+        
+        // Check if it's a validation error related to empty messages
+        if (error?.status === 400 && error?.message?.includes('empty content')) {
+          console.error('Validation error: Empty content detected in messages. Cleaning up conversation history...');
+          // If this is an empty content error and we have a conversation history, try again with minimal history
+          if (attempt < MAX_RETRIES && conversationHistory.length > 1) {
+            // Keep only the system message and the current user message for the next retry
+            const systemMsg = conversationHistory.find(msg => msg.role === 'system');
+            const cleanMessages = [];
+            if (systemMsg) cleanMessages.push(systemMsg);
+            if (message.trim() !== '') cleanMessages.push({ role: 'user', content: message });
+            conversationHistory = cleanMessages;
+            continue;
+          }
+        }
         
         // Check if it's an overloaded error (529) or rate limit error
         if (error?.status === 529 || error?.status === 429) {

@@ -286,6 +286,12 @@ const handleGeneralQuery = async (
   phone_number_id: string,
   from: string
 ) => {
+  // Early exit if message is empty
+  if (!message || message.trim() === '') {
+    console.log('Received empty message, skipping LLM processing');
+    return;
+  }
+
   const customerName = getCustomerName(conversation);
   const conversationSummary = getConversationSummary(conversation);
 
@@ -298,7 +304,7 @@ const handleGeneralQuery = async (
   };
 
   const recentMessages = conversation.messages
-    .filter((msg: any) => msg.role !== 'system')
+    .filter((msg: any) => msg.role !== 'system' && msg.content && msg.content.trim() !== '')
     .slice(-MAX_CONVERSATION_HISTORY);
 
   const messages = [
@@ -335,22 +341,29 @@ const handleGeneralQuery = async (
       }
     }
   } else {
-    await sendMessage(phone_number_id, from, aiResponse.content || '');
+    if (aiResponse.content) {
+      await sendMessage(phone_number_id, from, aiResponse.content);
+    }
   }
 
-  // Prepare new messages
-  const newMessages = [
-    { role: 'user', content: message },
-    { role: 'assistant', content: aiResponse.content || '' },
-  ];
+  // Add the user message and AI response to conversation history
+  if (message.trim() !== '') {
+    conversation.messages.push({ role: 'user', content: message });
+  }
+  
+  if (aiResponse.content && aiResponse.content.trim() !== '') {
+    conversation.messages.push({ role: 'assistant', content: aiResponse.content });
+  }
 
   // Keep only recent messages
-  let updatedMessages = [...conversation.messages, ...newMessages];
-  if (updatedMessages.length > MAX_CONVERSATION_HISTORY) {
-    const systemMsg = updatedMessages.find((msg: any) => msg.role === 'system');
-    const recentMessages = updatedMessages.slice(-MAX_CONVERSATION_HISTORY);
-    updatedMessages = systemMsg
-      ? [systemMsg, ...recentMessages.filter((msg: any) => msg.role !== 'system')]
+  if (conversation.messages.length > MAX_CONVERSATION_HISTORY) {
+    const systemMsg = conversation.messages.find((msg: any) => msg.role === 'system');
+    const recentMessages = conversation.messages
+      .filter((msg: any) => msg.role !== 'system' && msg.content && msg.content.trim() !== '')
+      .slice(-MAX_CONVERSATION_HISTORY);
+    
+    conversation.messages = systemMsg
+      ? [systemMsg, ...recentMessages]
       : recentMessages;
   }
 
@@ -359,9 +372,10 @@ const handleGeneralQuery = async (
     { _id: conversation._id },
     {
       $set: {
-        messages: updatedMessages,
+        messages: conversation.messages,
         preferredChannel: conversation.preferredChannel,
         lastInteractionDate: new Date(),
+        customerName: conversation.customerName
       },
     },
     { new: true }
