@@ -261,14 +261,12 @@ export class LLMService {
     // If we get here, all retries failed
     throw lastError || new Error(`Failed after ${MAX_RETRIES} attempts`);
   }
-
   // Detect intent using the LLM with retry logic
   public async detectIntent(message: string): Promise<IntentResponse> {
-    // let lastError;
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      
       try {
         const systemMessage = 'Sei un classificatore di intenti. Classifica il messaggio dell\'utente in uno di questi intenti: channel_preference, general_question. Rispondi solo in formato JSON con i campi "intent" e "confidence" (un numero tra 0 e 1).';
-        
+
         const response = await this.client.messages.create({
           model: this.modelName,
           system: systemMessage,
@@ -304,35 +302,24 @@ export class LLMService {
           };
         }
       } catch (error: any) {
-        console.error(`Error attempt ${attempt}/${MAX_RETRIES} detecting intent with ${this.provider}:`, error);
+        console.error(`Error detecting intent with ${this.provider}:`, error);
         // lastError = error;
         
         // Check if it's an overloaded error (529) or rate limit error
         if (error?.status === 529 || error?.status === 429) {
-          const retryDelay = RETRY_DELAY_MS * attempt;
-          console.log(`API overloaded or rate limited. Retrying in ${retryDelay}ms...`);
-          await sleep(retryDelay);
-          continue;
-        }
-        
-        // For last retry, return default
-        if (attempt === MAX_RETRIES) {
           return {
             intent: 'general_question',
             confidence: 0.5
           };
         }
       }
+      return {
+        intent: 'general_question',
+        confidence: 0.5
+      };
     }
     
     // If we get here, all retries failed
-    return {
-      intent: 'general_question',
-      confidence: 0.5
-    };
-  }
-
-  // Detect channel preference using the LLM with retry logic
   public async detectChannelPreference(message: string): Promise<ChannelPreferenceResponse> {
     // let lastError;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {

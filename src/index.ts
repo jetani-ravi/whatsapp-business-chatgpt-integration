@@ -9,7 +9,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import {router} from './Routes/v1';
+import { v1Router } from './Routes/v1';
 import { connectDatabase } from './config/database';
 import { blockSensitiveFiles, rateLimit, validateRequestMethod } from './middleware/security.middleware';
 import { bodyLogger, requestLogger } from './middleware/logging.middleware';
@@ -28,7 +28,7 @@ app.use(requestLogger);
 app.use(helmet()); // Security headers
 app.use(cors()); // Enable CORS
 app.use(morgan('dev')); // HTTP request logger
-app.use(express.json()); // Parse JSON bodies
+app.use(express.json({ limit: '10mb' })); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // app.use('/*', async(req: Request, res: Response, next: NextFunction) => {
@@ -50,7 +50,7 @@ app.use('/api/v1', validateRequestMethod);
 
 
 // API Routes
-app.use('/api/v1', router);
+app.use('/api/v1', v1Router);
 
 // Health check endpoint
 app.get('/health', (_req: Request, res: Response) => {

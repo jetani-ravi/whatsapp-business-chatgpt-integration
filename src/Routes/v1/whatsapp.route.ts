@@ -15,6 +15,7 @@ router.post('/initiate-call', asyncHandler(whatsappController.initiateFollowUpCa
 
 router.post('/webhook', asyncHandler(whatsappController.handleWebhook));
 router.post('/send-recommendations', asyncHandler(whatsappController.sendRecommendedProductOverWhatsApp));
+router.post('/save-customer-name', asyncHandler(whatsappController.saveCustomerName));
 
 router.post('/follow-up', asyncHandler(whatsappController.sendFollowUpMessage));
 export default router;

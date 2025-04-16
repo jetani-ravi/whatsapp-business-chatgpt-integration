@@ -5,6 +5,8 @@ export interface IConversation extends Document {
   isFirstInteraction: boolean;
   from: string;
   to: string;
+  summary: string;
+  transcript: string;
   phoneNumberId: string;
   preferredChannel?: 'voice' | 'chat' | 'whatsapp';
   lastInteractionDate: Date;
@@ -22,6 +24,8 @@ const ConversationSchema: Schema = new Schema({
   from: { type: String },
   customerName: { type: String },
   to: { type: String },
+  summary: { type: String, default: '' },
+  transcript: { type: String, default: '' },
   phoneNumberId: { type: String },
   preferredChannel: { type: String, enum: ['voice', 'chat','whatsapp'] },
   lastInteractionDate: { type: Date, required: true },

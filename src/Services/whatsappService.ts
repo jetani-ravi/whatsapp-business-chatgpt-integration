@@ -27,10 +27,6 @@ export const sendMessage = async (
         },
       }
     );
-
-    console.log('Whatsapp response____status', JSON.stringify(response.status));
-    console.log('Whatsapp response____', JSON.stringify(response.data));
-
     return response.data;
   } catch (error: any) {
     const errorMessage =
