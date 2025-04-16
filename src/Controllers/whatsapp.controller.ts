@@ -272,8 +272,6 @@ const getConversationSummary = async (conversation: any, isVoiceCall: boolean = 
     .map((msg: any) => `${msg.role}: ${msg.content}`)
     .join('\n');
 
-    console.log('getConversationSummary____messages____', messages);
-
     const transcript = conversation.transcript;
     let systemMessage = '';
 
@@ -307,7 +305,7 @@ Cronologia delle conversazioni tra cliente e assistente su WhatsApp. Genera un r
 
     if(isVoiceCall) {
       const summary = await llmService.getResponse(messages, systemMessage);
-      console.log('getConversationSummary____', summary?.content);
+      console.log('getConversationSummary____summary____', summary?.content);
       return summary?.content || '';
     }
     return messages;

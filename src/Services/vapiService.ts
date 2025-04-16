@@ -60,7 +60,6 @@ export const initiateVoiceCall = async (customerNumber: string, variableValues =
       };
     }
     console.log('Initiating voice call...', VAPI_API_URL, VAPI_API_KEY, VAPI_ASSISTANT_ID, VAPI_PHONE_NUMBER_ID, customerNumber);
-    console.log('VAPI BODY', JSON.stringify(body));
     await axios.post(
       VAPI_API_URL,
       body,
