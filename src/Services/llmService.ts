@@ -130,7 +130,7 @@ export class LLMService {
       };
     })
     .filter(msg => msg.role !== 'system')
-    .filter(msg => msg.content && msg.content.trim() !== ''); // Filter out messages with empty content
+    .filter(msg => msg?.content && msg?.content?.trim() !== ''); // Filter out messages with empty content
   }
 
   // // Extract system message from conversation history
@@ -157,15 +157,15 @@ export class LLMService {
           // If we have conversation history, use it
           // Convert conversation history to Anthropic messages and filter out empty messages
           messages = this.convertToAnthropicMessages(
-            conversationHistory.filter(msg => msg.content && msg.content.trim() !== '')
+            conversationHistory.filter(msg => msg?.content && msg?.content?.trim() !== '')
           );
           
           // Add the current message if it's not already included in the history
           const lastMessage = conversationHistory[conversationHistory.length - 1];
-          if ((lastMessage?.role !== 'user' || lastMessage?.content !== message) && message.trim() !== '') {
+          if ((lastMessage?.role !== 'user' || lastMessage?.content !== message) && message?.trim() !== '') {
             messages.push({ role: 'user', content: message });
           }
-        } else if (message.trim() !== '') {
+        } else if (message?.trim() !== '') {
           // For new conversations, just add the user's message if it's not empty
           messages.push({ role: 'user', content: message });
         }
@@ -239,7 +239,7 @@ export class LLMService {
             const systemMsg = conversationHistory.find(msg => msg.role === 'system');
             const cleanMessages = [];
             if (systemMsg) cleanMessages.push(systemMsg);
-            if (message.trim() !== '') cleanMessages.push({ role: 'user', content: message });
+            if (message?.trim() !== '') cleanMessages.push({ role: 'user', content: message });
             conversationHistory = cleanMessages;
             continue;
           }
