@@ -426,7 +426,7 @@ const handleGeneralQuery = async (
   if (!aiResponse) return;
 
   if (aiResponse.tool_calls && aiResponse.tool_calls.length > 0) {
-    // Changed from toolCalls to tool_calls
+    // Changed from tool_calls to tool_calls
     for (const toolCall of aiResponse.tool_calls) {
       if (
         toolCall.function.name === 'avviare_chiamata_vocale' ||
@@ -522,36 +522,36 @@ const sendRecommendedProductOverWhatsApp = async (req: Request, res: Response): 
     }
 
     // Extract recommended products from the tool calls
-    const toolCall = message.toolCalls?.find(
+    const toolCall = message.tool_calls?.find(
       (call: any) => call.function.name === 'sendProductRecommendations'
     );
 
     // Parse the arguments string to get the product list
     const args =
-      typeof toolCall.function.arguments === 'string'
-        ? JSON.parse(toolCall.function.arguments)
-        : toolCall.function.arguments;
+      typeof toolCall?.function?.arguments === 'string'
+        ? JSON.parse(toolCall?.function?.arguments)
+        : toolCall?.function?.arguments;
 
     console.log('args____', JSON.stringify(args));
 
     let products = [];
-    if (!args?.recommendedProductList) {
+    if (!args?.recommended_product_list) {
       console.error('No products found');
       res.status(200).send({ message: 'No recommended products found' });
       return;
     }
 
-    console.log('args____recommendedProductList', JSON.stringify(args.recommendedProductList));
+    console.log('args____recommendedProductList', JSON.stringify(args.recommended_product_list));
 
-    // Handle both array and object formats for recommendedProductList
-    if (Array.isArray(args.recommendedProductList)) {
-      // If recommendedProductList is already an array
-      products = args.recommendedProductList.map(
+    // Handle both array and object formats for recommended_product_list
+    if (Array.isArray(args.recommended_product_list)) {
+      // If recommended_product_list is already an array
+      products = args.recommended_product_list.map(
         (item: any) => item?.productList || item?.Items || item
       );
     } else {
-      // If recommendedProductList is an object, wrap it in an array
-      products = [args.recommendedProductList];
+      // If recommended_product_list is an object, wrap it in an array
+      products = [args.recommended_product_list];
     }
 
     const conversation = await Conversation.findOne({ phoneNumber });
@@ -593,7 +593,7 @@ const saveCustomerName = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Extract recommended products from the tool calls
-    const toolCall = message.toolCalls?.find(
+    const toolCall = message.tool_calls?.find(
       (call: any) => call.function.name === 'save_customer_name'
     );
 
@@ -605,7 +605,7 @@ const saveCustomerName = async (req: Request, res: Response): Promise<void> => {
 
     console.log('args____', JSON.stringify(args));
 
-    if (!args?.customerName) {
+    if (!args?.customer_name) {
       console.error('Customer Name not found');
       res.status(200).send({ message: "Customer name didn't found" });
       return;
@@ -613,10 +613,14 @@ const saveCustomerName = async (req: Request, res: Response): Promise<void> => {
 
     const conversation = await Conversation.findOne({ phoneNumber });
     if (conversation) {
-      console.log('args.customerName____', args.customerName);
+      console.log('args.customerName____1', args.customer_name);
       await Conversation.updateOne(
         { _id: conversation._id },
-        { $set: { customerName: args.customerName } }
+        {
+          $set: {
+            customerName: args.customer_name,
+          },
+        }
       );
     } else {
       console.error('Skip saving customer name because conversation not found');
