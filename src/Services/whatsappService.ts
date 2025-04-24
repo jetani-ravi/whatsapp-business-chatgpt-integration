@@ -105,6 +105,12 @@ export const sendWhatsAppFollowUpMessage = async (
   }
 };
 
+/**
+ * Sends a message to WhatsApp, handling chunking for long messages if needed
+ * WhatsApp has a character limit of approximately 4096 characters
+ */
+
+
 export default {
   sendMessage,
   sendWhatsAppFollowUpMessage,
