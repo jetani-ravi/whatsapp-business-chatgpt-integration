@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 // });
 
 // Connect to MongoDB
-connectDatabase();
+// connectDatabase();
 
 // Use body logger instead of inline middleware
 app.use(bodyLogger);
