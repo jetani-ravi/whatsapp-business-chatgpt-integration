@@ -10,7 +10,6 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import { v1Router } from './Routes/v1';
-import { connectDatabase } from './config/database';
 import { blockSensitiveFiles, rateLimit, validateRequestMethod } from './middleware/security.middleware';
 import { bodyLogger, requestLogger } from './middleware/logging.middleware';
 
