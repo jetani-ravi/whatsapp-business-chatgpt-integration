@@ -190,9 +190,9 @@ const handleNewConversation = async (phone_number_id: string, from: string) => {
     messages: [
       {
         role: 'system',
-        content: SYSTEM_PROMPT.replace('{first_name}', 'Non disponibile')
+        content: SYSTEM_PROMPT.replace('{first_name}', '')
           .replace('{CUSTOMER_PHONE_NUMBER}', from)
-          .replace('{previous_conversation}', 'Non disponibile')
+          .replace('{previous_conversation}', '')
           .replace('{recommended_products}', ''),
       },
     ],
@@ -279,11 +279,11 @@ const getConversationSummary = async (conversation: any, isVoiceCall: boolean = 
       systemMessage = 
       `Genera un riepilogo della conversazione con il cliente e l'assistente. Evidenzia i punti importanti e i prodotti consigliati. Punti chiave da includere: nome del cliente, tipo di pelle del cliente, problemi di pelle del cliente, prodotti consigliati, soddisfazione del cliente, passi successivi del cliente. Sii breve e conciso. Includi solo i dettagli della trascrizione, assicurati di non includere altre informazioni o di non aggiungere ipotesi.
 
-- Se non hai abbastanza informazioni per il riepilogo, restituisci "Non disponibile".
+- Se non hai abbastanza informazioni per il riepilogo.
 - Mantieni solo le informazioni della trascrizione, non aggiungere altre informazioni o di non aggiungere ipotesi.
 - Non aggiungere informazioni come "Genererò un riepilogo" o "Ecco il riepilogo della conversazione", restituisci semplicemente il riepilogo.
 - Se hai abbastanza informazioni, riepiloga solo quelle disponibili. Non chiedere ulteriori informazioni o le mie preferenze. Riepiloga solo ciò che hai e riepiloga la conversazione.
-- Se non hai abbastanza informazioni, restituisci "Non disponibile".
+- Se non hai abbastanza informazioni.
 - Assicurati di mantenere solo le informazioni essenziali, non aggiungere informazioni extra, sii conciso per il riepilogo della prossima chiamata.
 
 Trascrizione della chiamata vocale tra cliente e assistente:
@@ -294,7 +294,7 @@ Trascrizione della chiamata: ${transcript}
       systemMessage = `
       Genera un riepilogo della conversazione con il cliente e l'assistente. Evidenzia i punti importanti e i prodotti consigliati. Punti chiave da includere: nome del cliente, tipo di pelle del cliente, problemi di pelle del cliente, prodotti consigliati, soddisfazione del cliente, passaggi successivi del cliente. Sii breve e conciso. Includi solo i dettagli della trascrizione, assicurati di non includere altre informazioni o di non aggiungere ipotesi.
 - Assicurati di non aggiungere altre informazioni o di non aggiungere ipotesi. Se non hai abbastanza informazioni per il riepilogo, restituisci "Non disponibile". Se hai abbastanza informazioni, riepiloga semplicemente le informazioni disponibili. Non chiedere ulteriori informazioni o le mie preferenze. Riepiloga solo ciò che hai e riepiloga la conversazione.
-- Se non hai abbastanza informazioni, restituisci "Non disponibile".
+- Se non hai abbastanza informazioni.
 - Non aggiungere informazioni come "Genererò un riepilogo" o "Ecco il riepilogo della conversazione", restituisci solo il riepilogo.
 - Assicurati di mantenere solo le informazioni essenziali, non aggiungere informazioni extra, sii conciso per il riepilogo della prossima chiamata.
 
@@ -367,7 +367,7 @@ const updateRecommendedProducts = (conversation: any, product: any | Array<any>)
 
 const getCustomerName = (conversation: any) => {
   if (!conversation) return '';
-  return conversation.customerName || 'Non disponibile';
+  return conversation.customerName || '';
 };
 
 // const handleConsultationStart = async (
