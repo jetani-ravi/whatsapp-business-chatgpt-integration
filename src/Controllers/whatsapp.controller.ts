@@ -49,7 +49,7 @@ const sendFollowUpMessage = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-const handleWebhook = async (req: Request, res: Response): Promise<void> => {
+const handleWebhook = async (req: Request, res: Response): Promise<any> => {
   try {
     const { object, entry } = req.body;
 
@@ -111,9 +111,10 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
                 const formattedResponse = formatVoiceFlowResponses(voiceFlowResponse);
                 
                 // Send the response back to WhatsApp using sendLongMessage to handle large responses
-                await sendMessage(phone_number_id, from, formattedResponse);
-                
                 console.log(`Response ${formattedResponse} sent to ${from} successfully`);
+                await sendMessage(phone_number_id, from, formattedResponse);
+                return res.status(200).send('OK');
+                
               } catch (error) {
                 console.error('Error processing message with VoiceFlow:', error);
                 // Send fallback message if VoiceFlow fails
@@ -126,10 +127,9 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
             }
           }
         }
+        res.status(200).send('OK');
       }
     }
-
-    res.status(200).send('OK');
   } catch (error) {
     console.error('Error processing webhook:', error);
     res.status(500).send('Internal Server Error');

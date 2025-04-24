@@ -30,6 +30,17 @@ app.use(morgan('dev')); // HTTP request logger
 app.use(express.json({ limit: '10mb' })); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
+// app.use((req,res,next)=>{
+//   console.log('Headers', req.headers)
+//   if(!req.headers['x-api-key'] || req.headers['x-api-key'] !== process.env.PRIVATE_API_KEY) {
+//     res.status(200).json({
+//      success: false,
+//      message: 'Ok',
+//    })
+//  }
+//  next()
+// })
+
 // app.use('/*', async(req: Request, res: Response, next: NextFunction) => {
 //   console.log('__body', req.body)
 //   next()
@@ -37,6 +48,8 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Connect to MongoDB
 // connectDatabase();
+
+
 
 // Use body logger instead of inline middleware
 app.use(bodyLogger);
