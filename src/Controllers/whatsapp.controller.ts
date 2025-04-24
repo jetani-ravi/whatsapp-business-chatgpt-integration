@@ -4,6 +4,7 @@ import {
   sendWhatsAppFollowUpMessage,
 } from '../Services/whatsappService';
 import { getVoiceFlowResponse, formatVoiceFlowResponses } from '../Services/voiceflowService';
+import { isNewConversation, updateConversationState } from '../Services/redisService';
 
 const verifyWebhook = (req: Request, res: Response): void => {
   const mode = req.query['hub.mode'];
@@ -99,19 +100,25 @@ const handleWebhook = async (req: Request, res: Response): Promise<any> => {
                 // Generate a consistent user ID from the phone number
                 const userId = `whatsapp-${from}`;
                 
+                // Check if this is a new conversation
+                const isFirstTime = await isNewConversation(from);
+                console.log(`Is first time conversation for ${from}: ${isFirstTime}`);
+                
+                // Update conversation state in Redis
+                await updateConversationState(from);
                 
                 // Get response from VoiceFlow
                 // For first interaction, pass empty message to trigger the welcome flow
                 const voiceFlowResponse = await getVoiceFlowResponse(
                   userId, 
-                  msg_body
+                  isFirstTime ? '' : msg_body
                 );
                 
                 // Format the VoiceFlow response
                 const formattedResponse = formatVoiceFlowResponses(voiceFlowResponse);
                 
-                // Send the response back to WhatsApp using sendLongMessage to handle large responses
-                console.log(`Response ${formattedResponse} sent to ${from} successfully`);
+                // Send the response back to WhatsApp
+                console.log(`Response "${formattedResponse}" sent to ${from} successfully`);
                 await sendMessage(phone_number_id, from, formattedResponse);
                 return res.status(200).send('OK');
                 
@@ -126,8 +133,8 @@ const handleWebhook = async (req: Request, res: Response): Promise<any> => {
               }
             }
           }
+          res.status(200).send('OK');
         }
-        res.status(200).send('OK');
       }
     }
   } catch (error) {
@@ -135,8 +142,6 @@ const handleWebhook = async (req: Request, res: Response): Promise<any> => {
     res.status(500).send('Internal Server Error');
   }
 };
-
-
 
 export {
   verifyWebhook,
