@@ -3,8 +3,6 @@ import {
   sendMessage,
   sendWhatsAppFollowUpMessage,
 } from '../Services/whatsappService';
-import llmService from '../Services/llmService';
-import Conversation from '../Models/conversation.model';
 import { getVoiceFlowResponse, formatVoiceFlowResponses } from '../Services/voiceflowService';
 
 const verifyWebhook = (req: Request, res: Response): void => {
@@ -138,53 +136,6 @@ const handleWebhook = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const getConversationSummary = async (conversation: any, isVoiceCall: boolean = false) => {
-  if (!conversation) return '';
-
-   const messages = conversation.messages
-    .filter((msg: any) => msg.role !== 'system')
-    .map((msg: any) => `${msg.role}: ${msg.content}`)
-    .join('\n');
-
-    const transcript = conversation.transcript;
-    let systemMessage = '';
-
-    if(transcript) {
-      systemMessage = 
-      `Genera un riepilogo della conversazione con il cliente e l'assistente. Evidenzia i punti importanti e i prodotti consigliati. Punti chiave da includere: nome del cliente, tipo di pelle del cliente, problemi di pelle del cliente, prodotti consigliati, soddisfazione del cliente, passi successivi del cliente. Sii breve e conciso. Includi solo i dettagli della trascrizione, assicurati di non includere altre informazioni o di non aggiungere ipotesi.
-
-- Se non hai abbastanza informazioni per il riepilogo, restituisci "Non disponibile".
-- Mantieni solo le informazioni della trascrizione, non aggiungere altre informazioni o di non aggiungere ipotesi.
-- Non aggiungere informazioni come "Genererò un riepilogo" o "Ecco il riepilogo della conversazione", restituisci semplicemente il riepilogo.
-- Se hai abbastanza informazioni, riepiloga solo quelle disponibili. Non chiedere ulteriori informazioni o le mie preferenze. Riepiloga solo ciò che hai e riepiloga la conversazione.
-- Se non hai abbastanza informazioni, restituisci "Non disponibile".
-- Assicurati di mantenere solo le informazioni essenziali, non aggiungere informazioni extra, sii conciso per il riepilogo della prossima chiamata.
-
-Trascrizione della chiamata vocale tra cliente e assistente:
-Trascrizione della chiamata: ${transcript}
-
-È presente la cronologia delle conversazioni tra cliente e assistente su WhatsApp. Genera un riepilogo della conversazione con cliente e assistente. Evidenzia i punti importanti e i prodotti consigliati. Punti chiave da includere: nome del cliente, tipo di pelle del cliente, problemi di pelle del cliente, prodotti consigliati, soddisfazione del cliente, passaggi successivi del cliente. Sii breve e conciso. Includi solo i dettagli della trascrizione.`;
-    } else {
-      systemMessage = `
-      Genera un riepilogo della conversazione con il cliente e l'assistente. Evidenzia i punti importanti e i prodotti consigliati. Punti chiave da includere: nome del cliente, tipo di pelle del cliente, problemi di pelle del cliente, prodotti consigliati, soddisfazione del cliente, passaggi successivi del cliente. Sii breve e conciso. Includi solo i dettagli della trascrizione, assicurati di non includere altre informazioni o di non aggiungere ipotesi.
-- Assicurati di non aggiungere altre informazioni o di non aggiungere ipotesi. Se non hai abbastanza informazioni per il riepilogo, restituisci "Non disponibile". Se hai abbastanza informazioni, riepiloga semplicemente le informazioni disponibili. Non chiedere ulteriori informazioni o le mie preferenze. Riepiloga solo ciò che hai e riepiloga la conversazione.
-- Se non hai abbastanza informazioni, restituisci "Non disponibile".
-- Non aggiungere informazioni come "Genererò un riepilogo" o "Ecco il riepilogo della conversazione", restituisci solo il riepilogo.
-- Assicurati di mantenere solo le informazioni essenziali, non aggiungere informazioni extra, sii conciso per il riepilogo della prossima chiamata.
-
-Cronologia delle conversazioni tra cliente e assistente su WhatsApp. Genera un riepilogo della conversazione con cliente e assistente. Evidenzia i punti importanti e i prodotti consigliati. Punti chiave da includere: nome del cliente, tipo di pelle del cliente, problemi di pelle del cliente, prodotti consigliati, soddisfazione del cliente, passaggi successivi del cliente. Sii breve e conciso. Includi solo i dettagli dalla trascrizione. Cronologia delle conversazioni: ${messages}
-      `;
-    }
-
-
-    if(isVoiceCall) {
-      const summary = await llmService.getResponse(messages, systemMessage);
-      console.log('getConversationSummary____summary____', summary?.content);
-      return summary?.content || '';
-    }
-    return messages;
-
-};
 
 
 export {
